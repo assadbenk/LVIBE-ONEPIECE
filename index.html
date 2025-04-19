@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L'vibe - One Piece (9arasina) </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ruwudu:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff2a2a;
+            --secondary-color: #333;
+            --text-color: #fff;
+            --bg-color: #000;
+            --inactive-text: #888;
+        }
+        
+        body {
+            font-family: 'Ruwudu', serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--secondary-color);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5em;
+            margin: 0;
+        }
+        
+        .player-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.2);
+        }
+        
+        #youtube-player {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .lyrics-container {
+            background-color: rgba(20, 20, 20, 0.8);
+            border-radius: 10px;
+            padding: 30px;
+            min-height: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            border: 1px solid var(--secondary-color);
+            position: relative;
+        }
+        
+        .lyrics-line {
+            font-size: 1.7em;
+            text-align: center;
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            color: var(--inactive-text);
+            line-height: 1.8;
+        }
+        
+        .lyrics-line.active {
+            color: var(--primary-color);
+            background-color: rgba(255, 0, 0, 0.1);
+            transform: scale(1.03);
+            font-weight: 600;
+            text-shadow: 0 0 8px rgba(255, 0, 0, 0.5);
+        }
+        
+        .lyrics-line.next {
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Ruwudu', serif;
+            transition: all 0.3s;
+            font-size: 1.1em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            background-color: #ff0000;
+            transform: translateY(-3px);
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background-color: var(--secondary-color);
+            margin-top: 20px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            border-radius: 3px;
+            transition: width 0.1s linear;
+            position: relative;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .progress-container:hover .progress-bar::after {
+            opacity: 1;
+        }
+        
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: var(--inactive-text);
+        }
+        
+        
+        .freeze-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+        }
+        
+        .freeze-btn:hover {
+            transform: scale(1.1);
+            background-color: #27ae60;
+        }
+        
+        @media (max-width: 768px) {
+            .lyrics-line {
+                font-size: 1.5em;
+                margin: 15px 0;
+            }
+            
+            button {
+                padding: 10px 20px;
+                font-size: 1em;
+            }
+            
+            .lyrics-container {
+                padding: 20px;
+                max-height: 400px;
+            }
+            
+            .freeze-btn {
+                bottom: 20px;
+                left: 20px;
+                width: 45px;
+                height: 45px;
+            }
+        }
+        
+        
+        .lyrics-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .lyrics-container::-webkit-scrollbar-track {
+            background: rgba(50, 50, 50, 0.5);
+            border-radius: 10px;
+        }
+        
+        .lyrics-container::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+        }
+        
+        .lyrics-container::-webkit-scrollbar-thumb:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>L'vibe - One Piece (القراصنة)</h1>
+        </header>
+        
+        <div class="player-section">
+            <div class="video-container">
+                <div id="youtube-player"></div>
+            </div>
+            
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            
+            <div class="time-display">
+                <span id="currentTime">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+            
+            <div class="controls">
+                <button onclick="playPause()" id="playBtn">
+                    <span id="playIcon">▶</span> تشغيل
+                </button>
+                <button onclick="restartSong()">
+                    <span>↻</span> إعادة
+                </button>
+                <button onclick="toggleMute()" id="muteBtn">
+                    <span id="volumeIcon">🔊</span> صوت
+                </button>
+            </div>
+            
+            <div class="lyrics-container" id="lyricsContainer">
+                
+            </div>
+        </div>
+    </div>
+
+    
+    <button class="freeze-btn" id="freezeBtn" title="إيقاف التمرير التلقائي">
+        <span id="freezeIcon">⏸</span>
+    </button>
+
+    
+    <script src="https://www.youtube.com/iframe_api"></script>
+    
+    <script>
+        
+        const lyricsData = [
+            { time: 35.0, text: "Phantome hada 9alamina" },
+            { time: 36.5, text: "Some music min 3alamina" },
+            { time: 38.0, text: "Ghir b3in ki l9arasina" },
+            { time: 40.1, text: "Ghi les enemy ma banou ki fatou amami" },
+            { time: 41.7, text: "Bitch hada win dimarina" },
+            { time: 43.3, text: "One piece jit mugiwara" },
+            { time: 45.0, text: "Won peace mel lmarywana" },
+            { time: 46.9, text: "Li tnasini fi alami fi dakhel dalami" },
+            { time: 49.0, text: "Lucifer fuck l'illumina(ti)" },
+            { time: 50.2, text: "Titan rap phenomenal" },
+            { time: 52.0, text: "rjel sec ma tgominina" },
+            { time: 54.0, text: "B9a b3id meme nhar 3id la nt9ob 3inek w nwelli b les menottes" },
+            { time: 57.0, text: "Nta d3if wella ana s3ib" },
+            { time: 59.0, text: "Wida ana d7it tbanouli les Mineurs" },
+            { time: 61.1, text: "w ma b9ach ged li fat" },
+            { time: 62.0, text: "F wjhk tfou m3ana tfout fast food" },
+            { time: 64.0, text: "W ana lfaux nfascer fih" },
+            { time: 65.0, text: "Noskha men lface b" },
+            { time: 66.4, text: "Nghtasbok ta sghir machi ana li ndir rasi fih" },
+            { time: 69.0, text: "Phantome bla ta 7aja ndfenkom" },
+            { time: 71.0, text: "Sa7i nboul 3la fenkom" },
+            { time: 72.0, text: "Rani grib ndirlkom fin de carrière" },
+            { time: 74.0, text: "Tro7o avant arrier" },
+            { time: 76.0, text: "Ghi lweed li f layalinaa" },
+            { time: 77.2, text: "Mousi9a lvibe jaya lina" },
+            { time: 79.3, text: "Wa7yioun men khayalina" },
+            { time: 80.0, text: "Rasi alamani rani nasikom a l amis" },
+            { time: 82.0, text: "Bitch hada win dimarina" },
+            { time: 84.0, text: "One piece mugiwara" },
+            { time: 86.0, text: "One piece men lmarywana" },
+            { time: 87.0, text: "Li tnasini fi alami fi dakhel dalami" },
+            { time: 89.2, text: "Phantome hada 9alami na" },
+            { time: 90.2, text: "Some music min 3alamina" },
+            { time: 92.0, text: "Ghir b3in ki l9arasina" },
+            { time: 94.0, text: "Ghi les enemy ma banou ki fatou amami" },
+            { time: 96.0, text: "Bitch hada win dimarina" },
+            { time: 97.0, text: "One piece jit mugiwara" },
+            { time: 99.0, text: "Won peace mel lmarywana" },
+            { time: 100.0, text: "Li tnasini fi alami fi dakhel dalami" }
+        ];
+
+        
+        let player;
+        let currentLyricIndex = 0;
+        let isPlaying = false;
+        let isMuted = false;
+        let duration = 0;
+        let autoScrollEnabled = true;
+        let lyricsUpdateInterval;
+
+        
+        const lyricsContainer = document.getElementById('lyricsContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressContainer = document.getElementById('progressContainer');
+        const playBtn = document.getElementById('playBtn');
+        const playIcon = document.getElementById('playIcon');
+        const muteBtn = document.getElementById('muteBtn');
+        const volumeIcon = document.getElementById('volumeIcon');
+        const currentTimeDisplay = document.getElementById('currentTime');
+        const durationDisplay = document.getElementById('duration');
+        const freezeBtn = document.getElementById('freezeBtn');
+        const freezeIcon = document.getElementById('freezeIcon');
+
+        
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtube-player', {
+                height: '100%',
+                width: '100%',
+                videoId: 'tvn-si-AaTU',
+                playerVars: {
+                    'autoplay': 0,
+                    'controls': 0,
+                    'disablekb': 1,
+                    'modestbranding': 1,
+                    'rel': 0
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        
+        function onPlayerReady(event) {
+            duration = player.getDuration();
+            updateDurationDisplay();
+            displayLyrics();
+        }
+
+        
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                isPlaying = true;
+                playIcon.textContent = '⏸';
+                startLyricsUpdate();
+            } else if (event.data === YT.PlayerState.PAUSED) {
+                isPlaying = false;
+                playIcon.textContent = '▶';
+                stopLyricsUpdate();
+            } else if (event.data === YT.PlayerState.ENDED) {
+                isPlaying = false;
+                playIcon.textContent = '▶';
+                stopLyricsUpdate();
+            }
+        }
+
+        
+        function startLyricsUpdate() {
+            if (lyricsUpdateInterval) clearInterval(lyricsUpdateInterval);
+            lyricsUpdateInterval = setInterval(updateLyrics, 100);
+        }
+
+        
+        function stopLyricsUpdate() {
+            if (lyricsUpdateInterval) clearInterval(lyricsUpdateInterval);
+        }
+
+        
+        function displayLyrics() {
+            lyricsData.forEach((line, index) => {
+                const lyricElement = document.createElement('div');
+                lyricElement.className = 'lyrics-line';
+                lyricElement.textContent = line.text;
+                lyricElement.dataset.time = line.time;
+                lyricElement.dataset.index = index;
+                lyricsContainer.appendChild(lyricElement);
+            });
+        }
+
+        
+        function updateLyrics() {
+            const currentTime = player.getCurrentTime();
+            updateProgressBar(currentTime);
+            updateTimeDisplay(currentTime);
+            
+            const lyricsLines = document.querySelectorAll('.lyrics-line');
+            let activeFound = false;
+            
+            
+            lyricsLines.forEach(line => {
+                line.classList.remove('active', 'next');
+            });
+            
+            
+            for (let i = 0; i < lyricsLines.length; i++) {
+                const lineTime = parseFloat(lyricsLines[i].dataset.time);
+                const nextLineTime = i < lyricsLines.length - 1 ? parseFloat(lyricsLines[i + 1].dataset.time) : duration;
+                
+                if (currentTime >= lineTime && currentTime < nextLineTime) {
+                    lyricsLines[i].classList.add('active');
+                    activeFound = true;
+                    currentLyricIndex = i;
+                    
+                    
+                    if (i < lyricsLines.length - 1) {
+                        lyricsLines[i + 1].classList.add('next');
+                    }
+                    
+                    
+                    if (autoScrollEnabled) {
+                        lyricsLines[i].scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                    }
+                    
+                    break;
+                }
+            }
+        }
+
+        
+        function updateProgressBar(currentTime) {
+            const progressPercent = (currentTime / duration) * 100;
+            progressBar.style.width = progressPercent + '%';
+        }
+
+        
+        function updateTimeDisplay(currentTime) {
+            currentTimeDisplay.textContent = formatTime(currentTime);
+        }
+
+        
+        function updateDurationDisplay() {
+            durationDisplay.textContent = formatTime(duration);
+        }
+
+        
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        
+        function playPause() {
+            if (isPlaying) {
+                player.pauseVideo();
+            } else {
+                player.playVideo();
+                startLyricsUpdate();
+            }
+        }
+
+        
+        function restartSong() {
+            player.seekTo(0);
+            player.playVideo();
+            currentLyricIndex = 0;
+            startLyricsUpdate();
+        }
+
+        
+        function toggleMute() {
+            isMuted = !isMuted;
+            if (isMuted) {
+                player.mute();
+                volumeIcon.textContent = '🔇';
+            } else {
+                player.unMute();
+                volumeIcon.textContent = '🔊';
+            }
+        }
+
+        
+        function toggleAutoScroll() {
+            autoScrollEnabled = !autoScrollEnabled;
+            if (autoScrollEnabled) {
+                freezeIcon.textContent = '⏸';
+                freezeBtn.title = "إيقاف التمرير التلقائي";
+                freezeBtn.style.backgroundColor = '#2ecc71';
+                
+                
+                const activeLine = document.querySelector('.lyrics-line.active');
+                if (activeLine) {
+                    activeLine.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
+            } else {
+                freezeIcon.textContent = '▶';
+                freezeBtn.title = "تفعيل التمرير التلقائي";
+                freezeBtn.style.backgroundColor = '#e74c3c';
+                player.pauseVideo();
+            }
+        }
+
+        
+        progressContainer.addEventListener('click', (e) => {
+            const rect = progressContainer.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            const newTime = pos * duration;
+            player.seekTo(newTime, true);
+            
+            if (!isPlaying) {
+                player.playVideo();
+            }
+        });
+
+        
+        lyricsContainer.addEventListener('scroll', () => {
+            if (!autoScrollEnabled) {
+                
+            }
+        });
+
+        
+        freezeBtn.addEventListener('click', toggleAutoScroll);
+
+        
+        window.addEventListener('load', () => {
+            
+        });
+    </script>
+</body>
+</html>
